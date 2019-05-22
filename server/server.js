@@ -1,8 +1,10 @@
 require('./config/config')
 
 const express = require('express')
+const mongoose = require('mongoose');
 const app = express()
 const bodyParser = require('body-parser')
+
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -10,43 +12,33 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/usuario', function(req, res) {
-    res.json('get Usuario')
-})
+app.use(require('./routes/usuario'));
 
-app.post('/usuario', function(req, res) {
+mongoose.connect(process.env.URL_DB, { useNewUrlParser: true, useCreateIndex: true }, (err) => {
 
-    let body = req.body
-
-    if (body.nombre === undefined) {
-
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es obligatorio'
-        });
-
+    if (err) {
+        throw err;
     } else {
-        res.json({
-            body
-        })
+        console.log('Base de datos online');
     }
-
-})
-
-app.put('/usuario/:id', function(req, res) {
-
-    let id = req.params.id;
-
-    res.json({
-        id,
-        status: true
-    })
-})
-
-app.delete('/usuario', function(req, res) {
-    res.json('delete Usuario')
-})
+});
 
 app.listen(process.env.PORT, () => {
     console.log(`Escuchando puerto ${process.env.PORT}`);
 })
+
+
+/**
+ * 
+ * Usuario Atlas Mongodb
+ * 
+ * user: strider
+ * pass: BCEeVogiIlPokTu1
+ * role: atlasAdmin@admin
+ * 
+ * 
+ * MongoDB connection local:  mongodb://localhost:27017/cafe
+ * 
+ * MongoDB connection remote: mongodb+srv://strider:BCEeVogiIlPokTu1@cluster0-jsnvt.mongodb.net/cafe
+ * 
+ */
