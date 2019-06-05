@@ -7,17 +7,18 @@ const app = express()
 const bcrypt = require('bcrypt')
 const _ = require('underscore')
 const Usuario = require('../models/usuario')
+const { verificaToken, verificaAdmin } = require('../middlewares/autenticacion')
 
 const saltRounds = 10;
 
-app.get('/usuario', function(req, res) {
-
+app.get('/usuario', verificaToken, (req, res) => {
 
     let desde = req.query.desde || 0
     desde = Number(desde)
 
     let limite = req.query.limite || 5
     limite = Number(limite)
+
 
     Usuario.find({ estado: true }, 'nombre email img role') //Se especifican los campos que queremos regresar. El resto se ocultan de la api
         .skip(desde)
@@ -51,7 +52,7 @@ app.get('/usuario', function(req, res) {
 
 })
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificaToken, verificaAdmin], function(req, res) {
 
     let body = req.body
 
@@ -79,7 +80,7 @@ app.post('/usuario', function(req, res) {
     })
 })
 
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificaToken, verificaAdmin], function(req, res) {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'estado']);
@@ -101,7 +102,7 @@ app.put('/usuario/:id', function(req, res) {
     });
 })
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificaToken, verificaAdmin], function(req, res) {
 
     let id = req.params.id;
 
